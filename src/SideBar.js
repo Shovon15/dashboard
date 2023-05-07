@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
   Typography,
@@ -10,6 +10,7 @@ import {
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 import { DashboardContext } from "./Context/DashboardContext";
+import { useRef } from "react";
 
 export default function Sidebar() {
   const { open, setOpen } = useContext(DashboardContext);
@@ -17,9 +18,27 @@ export default function Sidebar() {
   const [openClass, setOpenClass] = useState("w-full");
 
   const openCheck = useMemo(() => {
-    if (open) setOpenClass("w-full");
-    else setOpenClass("w-12");
+    if (open) setOpenClass("w-full ease-in-out duration-500");
+    else setOpenClass("w-12 ease-in-out duration-500");
   }, [open]);
+
+  // ---------for click outside nav close--------------------
+  let menuRef = useRef();
+
+  useEffect(() => {
+    let handler = (e) => {
+      if (!menuRef.current.contains(e.target)) {
+        setOpen(window.innerWidth >= 920);
+        console.log(menuRef.current);
+      }
+    };
+
+    document.addEventListener("mousedown", handler);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+    };
+  });
 
   const menus = [
     { name: "Dashboard", link: "", icon: "stats-chart-outline" },
@@ -46,7 +65,9 @@ export default function Sidebar() {
     <Card
       className={`fixed ${
         open ? "w-72" : "w-20"
-      } min-h-screen bg-[#28dab6] z-10 text-white p-4 shadow-xl duration-500 rounded-none shadow-blue-gray-900/5`}
+      } min-h-screen bg-[#28dab6] z-10 text-white p-4 shadow-xl duration-500 rounded-none
+       shadow-blue-gray-900/5`}
+      ref={menuRef}
     >
       <div className="mb-2 p-0 flex justify-between items-center">
         <Typography
